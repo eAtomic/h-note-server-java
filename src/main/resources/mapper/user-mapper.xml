@@ -1,0 +1,70 @@
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hyv5.hnote.mapper.UserMapper">
+    <resultMap type="cn.hyv5.hnote.entity.qo.SimpleUserResult" id="simple_user_result">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="nickname" property="nickname"/>
+        <result column="phone" property="phone"/>
+        <result column="country_cd" property="countryCd"/>
+        <result column="mail" property="mail"/>
+        <result column="avatar" property="avatar"/>
+        <result column="avatar_wrapper" property="avatarWrapper"/>
+        <result column="vip_type" property="vipType"/>
+        <result column="vip_expire" property="vipExpire"/>
+        <collection property="roles"  ofType="cn.hyv5.hnote.entity.po.Role">
+            <id column="role_id" property="id"/>
+            <result  column="role_name" property="roleName" />
+            <result column="role_description" property="description" />
+        </collection>
+        <collection property="permissions"  ofType="cn.hyv5.hnote.entity.po.Permission" >
+            <id column="permission_id" property="id"/>
+            <result column="permission_name" property="permissionName" />
+            <result column="permissions_description" property="description" />
+        </collection>
+    </resultMap>
+
+    <select id="getSimpleUser" resultMap="simple_user_result" parameterType="string">
+        SELECT
+            u.id as id,
+            u.username as username,
+            u.nickname as nickname,
+            u.phone as phone,
+            u.country_cd as country_cd,
+            u.mail as mail,
+            u.avatar as avatar,
+            u.avatar_wrapper as avatar_wrapper,
+            u.vip_type as vip_type,
+            u.vip_expire as vip_expire,
+            r.id as role_id,
+            upper(r.role_name) as role_name,
+            r.description as role_description,
+            p.id as permission_id,
+            upper(p.permission_name) as permission_name,
+            p.description as permissions_description
+        FROM
+            users u
+                LEFT JOIN user_role ur ON u.id = ur.user_id
+                LEFT JOIN role r ON r.id = ur.role_id
+                LEFT JOIN role_permission rp ON r.id = rp.role_id
+                LEFT JOIN permission p ON p.id = rp.permission_id
+        WHERE
+            1 = 1
+            <if test=" userid != null and userid != '' ">
+                AND u.id = #{userid}
+            </if>
+            <if test=" username != null and username != '' ">
+                AND u.username = #{username}
+            </if>
+                AND u.status = '1'
+                AND ur.status = '1'
+                AND r.status = '1'
+                AND p.status = '1'
+                AND u.deleted = '0'
+                AND ur.deleted = '0'
+                AND p.deleted = '0'
+                AND r.deleted = '0'
+    </select>
+</mapper>

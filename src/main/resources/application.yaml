@@ -1,0 +1,37 @@
+server:
+  port: 18080
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      jdbc-url: jdbc:postgresql://localhost:15432/pg1
+      username: postgres
+      password: 779778819
+      auto-commit: false
+      connection-timeout: 15_000
+      maximum-pool-size: 20
+      minimum-idle: 5
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      timeout: 10000
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: 1ms
+          max-idle: 8
+          min-idle: 0
+        shutdown-timeout: 100
+mybatis:
+  mapper-locations: classpath:/mapper/**/*.xml
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+springdoc:
+  swagger-ui:
+    path: /doc.html
