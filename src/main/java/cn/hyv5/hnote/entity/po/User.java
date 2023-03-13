@@ -6,13 +6,21 @@ import cn.hyv5.hnote.entity.enums.UserVerifyCodeType;
 import cn.hyv5.hnote.entity.enums.UserVipType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -44,10 +52,25 @@ public class User extends BaseEntity<User> implements UserDetails {
     private String microsoftId;
     private String googleId;
     private String appleId;
+    @TableField(exist = false)
+    private List<Role> roles;
+    @TableField(exist = false)
+    private List<Permission> permissions;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        if (roles == null || permissions == null) {
+            return Lists.newArrayList();
+        }
+        var roleStream = roles
+                .stream()
+                .map(role->"ROLE_"+role.getRoleName().toUpperCase());
+        var permissionStream = permissions
+                .stream()
+                .map(permission -> permission.getPermissionName().toUpperCase());
+        return Stream.concat(roleStream, permissionStream)
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
     }
 
     @Override

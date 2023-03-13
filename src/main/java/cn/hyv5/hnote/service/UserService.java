@@ -14,12 +14,11 @@ import org.springframework.stereotype.Service;
 public class UserService extends ServiceImpl<UserMapper, User> implements UserDetailsService {
     @Resource
     private UserMapper mapper;
-    public SimpleUserResult getSimpleUser(String userid, String username) {
-        return mapper.getSimpleUser(userid, username);
+    public User getUserByUsername(String username) {
+        return mapper.getUserByUsername(username);
     }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-        return null;
+        return getUserByUsername(username);
     }
 }

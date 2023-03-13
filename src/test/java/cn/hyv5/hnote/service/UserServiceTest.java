@@ -111,7 +111,7 @@ class UserServiceTest {
 
     @Test
     void getSimpleUser() {
-        var user = service.getSimpleUser(null,"admin");
+        var user = service.getUserByUsername("admin");
         log.info(user.toString());
 
     }

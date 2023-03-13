@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.hyv5.hnote.mapper.UserMapper">
-    <resultMap type="cn.hyv5.hnote.entity.qo.SimpleUserResult" id="simple_user_result">
+    <resultMap type="cn.hyv5.hnote.entity.po.User" id="simple_user_result">
         <id column="id" property="id"/>
         <result column="username" property="username"/>
         <result column="nickname" property="nickname"/>
@@ -14,6 +14,10 @@
         <result column="avatar_wrapper" property="avatarWrapper"/>
         <result column="vip_type" property="vipType"/>
         <result column="vip_expire" property="vipExpire"/>
+        <result column="update_time" property="updateTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="create_time" property="createTime" />
+        <result column="create_by" property="createBy" />
         <collection property="roles"  ofType="cn.hyv5.hnote.entity.po.Role">
             <id column="role_id" property="id"/>
             <result  column="role_name" property="roleName" />
@@ -26,7 +30,7 @@
         </collection>
     </resultMap>
 
-    <select id="getSimpleUser" resultMap="simple_user_result" parameterType="string">
+    <select id="getUserByUsername" resultMap="simple_user_result" parameterType="string">
         SELECT
             u.id as id,
             u.username as username,
@@ -38,6 +42,10 @@
             u.avatar_wrapper as avatar_wrapper,
             u.vip_type as vip_type,
             u.vip_expire as vip_expire,
+            u.update_time as update_time,
+            u.update_by as update_by,
+            u.create_time as create_time,
+            u.create_by as create_by,
             r.id as role_id,
             upper(r.role_name) as role_name,
             r.description as role_description,
@@ -51,13 +59,7 @@
                 LEFT JOIN role_permission rp ON r.id = rp.role_id
                 LEFT JOIN permission p ON p.id = rp.permission_id
         WHERE
-            1 = 1
-            <if test=" userid != null and userid != '' ">
-                AND u.id = #{userid}
-            </if>
-            <if test=" username != null and username != '' ">
-                AND u.username = #{username}
-            </if>
+                    u.username = #{username}
                 AND u.status = '1'
                 AND ur.status = '1'
                 AND r.status = '1'
