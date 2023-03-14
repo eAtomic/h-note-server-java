@@ -15,7 +15,7 @@ import java.util.Optional;
 public class StandardAuthenticationProcessingFilter extends AbstractAuthenticationProcessingFilter {
     public static final String USERNAME_FIELD = "username";
     public static final String PASSWORD_FIELD = "password";
-    protected StandardAuthenticationProcessingFilter() {
+    public StandardAuthenticationProcessingFilter() {
         super("/login/standard");
     }
 

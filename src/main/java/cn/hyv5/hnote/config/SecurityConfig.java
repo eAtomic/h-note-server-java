@@ -1,7 +1,9 @@
 package cn.hyv5.hnote.config;
 
+import cn.hyv5.hnote.aop.StandardAuthenticationProcessingFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -12,8 +14,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@EnableWebSecurity
-public class SecurityConfig{
+@EnableWebSecurity(debug = true)
+public class SecurityConfig {
     private static final String[] AUTH_WHITELIST = {
             // -- Swagger UI v2
             "/v2/api-docs",
@@ -50,5 +52,11 @@ public class SecurityConfig{
                 );
 
         return http.build();
+    }
+    //@Bean
+    public StandardAuthenticationProcessingFilter standardAuthenticationProcessingFilter() throws Exception {
+        var filter = new StandardAuthenticationProcessingFilter();
+//        filter.setAuthenticationManager();
+        return filter;
     }
 }
