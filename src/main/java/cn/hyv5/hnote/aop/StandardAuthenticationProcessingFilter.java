@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class StandardAuthenticationProcessingFilter extends AbstractAuthenticationProcessingFilter {
-    public static final String USERNAME_FIELD = "username";
+    public static final String USERNAME_FIELD = "account";
     public static final String PASSWORD_FIELD = "password";
     public StandardAuthenticationProcessingFilter() {
         super("/login/standard");
@@ -24,8 +24,8 @@ public class StandardAuthenticationProcessingFilter extends AbstractAuthenticati
         if(!request.getMethod().equals("POST")) {
             throw new AuthenticationServiceException("Authentication method not supported:" + request.getMethod());
         }
-        var username = Optional.of(request.getParameter(USERNAME_FIELD)).orElse("").trim();
-        var password = Optional.of(request.getParameter(PASSWORD_FIELD)).orElse("").trim();
+        var username = Optional.ofNullable(request.getParameter(USERNAME_FIELD)).orElse("").trim();
+        var password = Optional.ofNullable(request.getParameter(PASSWORD_FIELD)).orElse("").trim();
 
         var authRequest = new UsernamePasswordAuthenticationToken(username, password);
         authRequest.setDetails(authenticationDetailsSource.buildDetails(request));

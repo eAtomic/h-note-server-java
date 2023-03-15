@@ -1,32 +1,49 @@
 package cn.hyv5.hnote.config;
 
+import cn.hyv5.hnote.aop.StandardAuthenticationFailureHandler;
 import cn.hyv5.hnote.aop.StandardAuthenticationProcessingFilter;
 
+import cn.hyv5.hnote.aop.StandardAuthenticationSuccessHandler;
+import cn.hyv5.hnote.service.UserService;
+import jakarta.annotation.Resource;
+import jakarta.inject.Inject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.SecurityConfigurer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity(debug = true)
-public class SecurityConfig implements SecurityConfigurer{
+public class SecurityConfig {
 
     @Autowired
     private AuthenticationManager authenticationManager;
-
+    @Autowired
+    private UserService userService;
+    @Resource
+    private StandardAuthenticationSuccessHandler successHandler;
+    @Resource
+    private StandardAuthenticationFailureHandler failureHandler;
     private static final String[] AUTH_WHITELIST = {
+            "/",
+            "/index.html",
             // -- Swagger UI v2
             "/v2/api-docs",
             "v2/api-docs",
@@ -59,11 +76,14 @@ public class SecurityConfig implements SecurityConfigurer{
     ) throws Exception {
         
         http
-                .addFilterBefore(standardAuthenticationProcessingFilter, UsernamePasswordAuthenticationFilter.class)
+                //.addFilterBefore(standardAuthenticationProcessingFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin()
                 .loginPage("/")
+                .usernameParameter("account")
                 .loginProcessingUrl("/login/standard")
-                .loginProcessingUrl("/login/sso")
+                .successHandler(successHandler)
+                .failureHandler(failureHandler)
+                //.loginProcessingUrl("/login/sso")
                 .and()
                 .authorizeHttpRequests((auth)-> auth
                             .requestMatchers(AUTH_WHITELIST).permitAll()
@@ -84,12 +104,18 @@ public class SecurityConfig implements SecurityConfigurer{
         return http.build();
     }
     @Bean
-    public StandardAuthenticationProcessingFilter standardAuthenticationProcessingFilter() throws Exception {
+    public StandardAuthenticationProcessingFilter standardAuthenticationProcessingFilter(StandardAuthenticationSuccessHandler successHandler, StandardAuthenticationFailureHandler failureHandler) throws Exception {
         var filter = new StandardAuthenticationProcessingFilter();
         filter.setAuthenticationManager(authenticationManager);
-        filter.setAuthenticationSuccessHandler(null);
-        filter.setAuthenticationFailureHandler(null);
+        filter.setAuthenticationSuccessHandler(successHandler);
+        filter.setAuthenticationFailureHandler(failureHandler);
         return filter;
     }
-
+    @Bean
+    public AuthenticationProvider authenticationProvider(){
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userService);
+        authenticationProvider.setPasswordEncoder(new BCryptPasswordEncoder());
+        return authenticationProvider;
+    }
 }

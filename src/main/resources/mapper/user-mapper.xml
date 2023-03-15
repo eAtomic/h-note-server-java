@@ -7,6 +7,8 @@
         <id column="id" property="id"/>
         <result column="username" property="username"/>
         <result column="nickname" property="nickname"/>
+        <result column="password" property="password" />
+        <result column="salt" property="salt" />
         <result column="phone" property="phone"/>
         <result column="country_cd" property="countryCd"/>
         <result column="mail" property="mail"/>
@@ -35,6 +37,8 @@
             u.id as id,
             u.username as username,
             u.nickname as nickname,
+            u.pass as password,
+            u.salt as salt,
             u.phone as phone,
             u.country_cd as country_cd,
             u.mail as mail,
