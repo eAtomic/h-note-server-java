@@ -4,7 +4,7 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     hikari:
-      jdbc-url: jdbc:postgresql://localhost:15432/pg1
+      jdbc-url: jdbc:postgresql://172.17.0.1:5432/pg1
       username: postgres
       password: 779778819
       auto-commit: false

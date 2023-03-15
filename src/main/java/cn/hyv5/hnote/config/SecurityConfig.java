@@ -1,8 +1,13 @@
 package cn.hyv5.hnote.config;
 
 import cn.hyv5.hnote.aop.StandardAuthenticationProcessingFilter;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.SecurityConfigurer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -12,10 +17,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity(debug = true)
-public class SecurityConfig {
+public class SecurityConfig implements SecurityConfigurer{
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     private static final String[] AUTH_WHITELIST = {
             // -- Swagger UI v2
             "/v2/api-docs",
@@ -43,20 +53,43 @@ public class SecurityConfig {
             "/health/**"
     };
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+        HttpSecurity http,
+        StandardAuthenticationProcessingFilter standardAuthenticationProcessingFilter
+    ) throws Exception {
+        
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .addFilterBefore(standardAuthenticationProcessingFilter, UsernamePasswordAuthenticationFilter.class)
+                .formLogin()
+                .loginPage("/")
+                .loginProcessingUrl("/login/standard")
+                .loginProcessingUrl("/login/sso")
+                .and()
                 .authorizeHttpRequests((auth)-> auth
                             .requestMatchers(AUTH_WHITELIST).permitAll()
                             .anyRequest().authenticated()
-                );
+                )
+                .logout()
+                .logoutUrl("/logout")
+                .and()
+                .headers()
+                .frameOptions()
+                .sameOrigin()
+                .contentSecurityPolicy("frame-ancestors 'self'; default-src 'self' 'unsafe-inline' 'unsafe-eval' *.aliyuncs.com *.baidu.com *.bdimg.com ;object-src 'self'")
+                .and()
+                .and()
+                .csrf(AbstractHttpConfigurer::disable)
+                ;
 
         return http.build();
     }
-    //@Bean
+    @Bean
     public StandardAuthenticationProcessingFilter standardAuthenticationProcessingFilter() throws Exception {
         var filter = new StandardAuthenticationProcessingFilter();
-//        filter.setAuthenticationManager();
+        filter.setAuthenticationManager(authenticationManager);
+        filter.setAuthenticationSuccessHandler(null);
+        filter.setAuthenticationFailureHandler(null);
         return filter;
     }
+
 }
