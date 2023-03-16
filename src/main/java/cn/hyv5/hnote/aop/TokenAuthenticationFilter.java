@@ -1,9 +1,18 @@
 package cn.hyv5.hnote.aop;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
+import cn.hyv5.hnote.utils.SessionUtil;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Streams;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -22,31 +31,26 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Resource
-    private RedisTemplate<String,Object> redisTemplate;
+    private SessionUtil sessionUtil;
     
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        try {
-            // 获取AuthorizationToken
-            String authorization = getAuthorization(request);
-            // 从缓存中获取用户信息
-            //UserDetails userDetails = (UserDetails)redisTemplate.opsForValue().get(authorization);
-            var tokenHash = redisTemplate.boundHashOps("login_session");
-            UserDetails userDetails = (UserDetails)tokenHash.get(authorization);
-            Assert.notNull(userDetails,"登录已过期请重新登录");
-
-            // 构建AuthenticationToken
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            // 把AuthenticationToken放到当前线程,表示认证完成
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        var loginInfo = sessionUtil.getLoginInfo();
+        if (loginInfo.isEmpty()){
             filterChain.doFilter(request, response);
-        } catch (SecurityException e) {
-            //ResponseUtil.renderJson(response, e);
-            SpringUtils.renderResult(e.getMessage());
+            return;
         }
+        var tinyUser = loginInfo.get().getUser();
+        var authorities = Streams.concat(
+                tinyUser.getRoles().stream(),
+                tinyUser.getPermissions().stream()
+        ).map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(tinyUser.getUsername(), null, authorities);
+        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        filterChain.doFilter(request, response);
     }
     
 }

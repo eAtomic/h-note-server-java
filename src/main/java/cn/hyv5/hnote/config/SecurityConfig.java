@@ -4,6 +4,7 @@ import cn.hyv5.hnote.aop.StandardAuthenticationFailureHandler;
 import cn.hyv5.hnote.aop.StandardAuthenticationProcessingFilter;
 
 import cn.hyv5.hnote.aop.StandardAuthenticationSuccessHandler;
+import cn.hyv5.hnote.aop.TokenAuthenticationFilter;
 import cn.hyv5.hnote.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity(debug = true)
@@ -30,6 +32,8 @@ public class SecurityConfig {
     private StandardAuthenticationSuccessHandler successHandler;
     @Resource
     private StandardAuthenticationFailureHandler failureHandler;
+    @Resource
+    private TokenAuthenticationFilter tokenAuthenticationFilter;
     private static final String[] AUTH_WHITELIST = {
             "/",
             "/index.html",
@@ -65,6 +69,7 @@ public class SecurityConfig {
     ) throws Exception {
         
         http
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 //.addFilterBefore(standardAuthenticationProcessingFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin()
                 .loginPage("/")
@@ -88,6 +93,7 @@ public class SecurityConfig {
                 .and()
                 .and()
                 .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement().disable()
                 ;
 
         return http.build();

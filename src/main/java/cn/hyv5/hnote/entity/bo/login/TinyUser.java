@@ -1,4 +1,4 @@
-package cn.hyv5.hnote.entity.bo;
+package cn.hyv5.hnote.entity.bo.login;
 
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalUnit;
@@ -27,10 +27,8 @@ import lombok.NoArgsConstructor;
 public class TinyUser {
     private String id;
     private String username;
-    private LocalDateTime expire;
     private UserVipType vipType;
     private LocalDateTime vipExpire;
-    // private String ip;
     private String rand;
     private List<String> roles;
     private List<String> permissions;
@@ -42,7 +40,6 @@ public class TinyUser {
         this.vipExpire = user.getVipExpire();
         // this.expire = LocalDateTime.now().plusSeconds(during);
         this.rand = RandomUtil.randomString(8);
-        // this.ip = SpringUtils.getRequest().getRemoteAddr();
         if(user.getRoles() == null){
             this.roles = new ArrayList<>();
         }else{
