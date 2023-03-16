@@ -55,6 +55,7 @@ public class RedisConfig implements CachingConfigurer {
         RedisCacheManager cacheManager = new RedisCacheManager(writer, config);
         return cacheManager;
     }
+
     @Bean
     public RedisTemplate<String, String> redisTemplate(LettuceConnectionFactory factory) {
         //创建Redis缓存操作助手RedisTemplate对象

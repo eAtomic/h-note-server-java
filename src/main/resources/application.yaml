@@ -1,3 +1,11 @@
+app:
+  session:
+    expire_during: 1800
+  token:
+    secret: "R7+U787cbjG0jE3814V^A0C#nR%zVCAi2+H_&$Gko_%aljcrF%Csuxmvn*Lf=*4_hyoWNVYnys96IlHwX*o%LpyAjfAJd^k79X"
+  cache:
+    session_prefix: "SESSION:"
+    user_prefix: "USER:"
 server:
   port: 18080
 spring:
@@ -13,7 +21,7 @@ spring:
       minimum-idle: 5
   data:
     redis:
-      host: localhost
+      host: 172.17.0.1
       port: 6379
       database: 0
       timeout: 10000

@@ -46,8 +46,8 @@ class UserServiceTest {
     @Test
     void save() {
         User testUser = new User();
-        testUser.setUsername("test");
-        testUser.setNickname("测试用户");
+        testUser.setUsername("admin");
+        testUser.setNickname("Admin");
         testUser.setPassword("123456");
         testUser.setSalt("111111");
         testUser.setAvatar("");
