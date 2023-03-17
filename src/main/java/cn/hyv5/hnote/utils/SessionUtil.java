@@ -14,6 +14,7 @@ import cn.hutool.crypto.symmetric.SymmetricCrypto;
 import cn.hutool.json.JSONUtil;
 import cn.hyv5.hnote.entity.bo.login.TinyUser;
 import cn.hyv5.hnote.entity.po.User;
+import cn.hyv5.hnote.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -30,6 +31,8 @@ public class SessionUtil {
     private String sessionPrefix;
     @Value("${app.cache.user_cache_key}")
     private String userCacheKey;
+    @Resource
+    private UserService userService;
 
     @Resource
     private RedisTemplate<String, LoginClient> redisTemplate;
@@ -51,16 +54,6 @@ public class SessionUtil {
         userCacheHash.put(user.getId(), user);
     }
 
-    public Optional<User> getUser(){
-        var loginInfo = getLoginInfo();
-        var userCacheHash = redisTemplate.boundHashOps(userCacheKey);
-        return loginInfo
-                .map(info->info.getUser())
-                .map(TinyUser::getId)
-                .map(id->(User)userCacheHash.get(id));
-
-    }
-
     public Optional<LoginInfo> getLoginInfo(){
         //获取Token
         var request = SpringUtils.getRequest();
@@ -77,16 +70,21 @@ public class SessionUtil {
             return Optional.empty();
         }
         //获取Token对应的User
-        var user = JSONUtil.toBean(json, TinyUser.class);
+        var tinyUser = JSONUtil.toBean(json, TinyUser.class);
 
-        var sessionSet = redisTemplate.boundSetOps(sessionPrefix + user.getId());
+        var sessionSet = redisTemplate.boundSetOps(sessionPrefix + tinyUser.getId());
 
         var size = sessionSet.size();
 
         if(size == null || size == 0) {
             return Optional.empty();
         }
-
+        var userCacheHash = redisTemplate.boundHashOps(userCacheKey);
+        User user = (User)userCacheHash.get(tinyUser.getId());
+        if(user == null) {
+            user = userService.getById(tinyUser.getId());
+            userCacheHash.put(tinyUser.getId(), user);
+        }
         var loginSessionValue = new LoginInfo(user, sessionSet.members());
 
     return Optional.ofNullable(loginSessionValue);

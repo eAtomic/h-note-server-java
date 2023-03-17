@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -27,7 +28,7 @@ public class StandardAuthenticationProcessingFilter extends AbstractAuthenticati
         var username = Optional.ofNullable(request.getParameter(USERNAME_FIELD)).orElse("").trim();
         var password = Optional.ofNullable(request.getParameter(PASSWORD_FIELD)).orElse("").trim();
 
-        var authRequest = new UsernamePasswordAuthenticationToken(username, password);
+        var authRequest = new PreAuthenticatedAuthenticationToken(username, password);
         authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
         return getAuthenticationManager().authenticate(authRequest);
     }

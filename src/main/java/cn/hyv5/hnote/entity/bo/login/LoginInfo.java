@@ -5,9 +5,11 @@ import lombok.Data;
 
 import java.util.Set;
 
+import cn.hyv5.hnote.entity.po.User;
+
 @Data
 @AllArgsConstructor
 public class LoginInfo {
-    private TinyUser user;
+    private User user;
     private Set<LoginClient> clients;
 }
