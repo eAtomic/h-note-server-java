@@ -4,6 +4,7 @@ import cn.hyv5.hnote.entity.enums.EntityStatusType;
 import cn.hyv5.hnote.entity.enums.UserVerifyCodeType;
 import cn.hyv5.hnote.entity.enums.UserVipType;
 import cn.hyv5.hnote.entity.po.User;
+import cn.hyv5.hnote.utils.SessionUtil;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,8 @@ class UserServiceTest {
     private Logger log = LoggerFactory.getLogger(getClass());
     @Resource
     private UserService service;
+    @Resource
+    private SessionUtil sessionUtil;
     @BeforeEach
     void setUp() {
     }
@@ -112,7 +115,7 @@ class UserServiceTest {
     @Test
     void getSimpleUser() {
         var user = service.getUserByUsername("admin");
-        log.info(user.toString());
-
+//        log.info(user.toString());
+        log.info(sessionUtil.makeToken(user));
     }
 }

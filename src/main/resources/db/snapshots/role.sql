@@ -1,0 +1,2 @@
+INSERT INTO "role" ("id", "role_name", "description", "status", "create_time", "create_by", "update_time", "update_by", "deleted") VALUES ('1634891348071358465', 'USER', '普通登录用户', '1', '2023-03-12 20:17:26.85465', 'junit', '2023-03-12 20:17:26.855646', 'junit', '0');
+INSERT INTO "role" ("id", "role_name", "description", "status", "create_time", "create_by", "update_time", "update_by", "deleted") VALUES ('1634891847747125249', 'ADMIN', '管理员', '1', '2023-03-12 20:19:25.986539', 'junit', '2023-03-12 20:19:25.986539', 'junit', '0');

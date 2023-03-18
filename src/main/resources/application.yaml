@@ -2,17 +2,17 @@ app:
   session:
     expire_during: 1800
   token:
-    secret: "R7+U787cbjG0jE3814V^A0C#nR%zVCAi2+H_&$Gko_%aljcrF%Csuxmvn*Lf=*4_hyoWNVYnys96IlHwX*o%LpyAjfAJd^k79X"
+    secret: "C#nR%zVCAi2+H_&$"
   cache:
     session_prefix: "SESSION:"
-    user_prefix: "USER:"
+    user_cache_key: "USER_CACHE"
 server:
   port: 18080
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     hikari:
-      jdbc-url: jdbc:postgresql://172.17.0.1:5432/pg1
+      jdbc-url: jdbc:postgresql://localhost:15432/pg1
       username: postgres
       password: 779778819
       auto-commit: false
@@ -21,7 +21,7 @@ spring:
       minimum-idle: 5
   data:
     redis:
-      host: 172.17.0.1
+      host: localhost
       port: 6379
       database: 0
       timeout: 10000

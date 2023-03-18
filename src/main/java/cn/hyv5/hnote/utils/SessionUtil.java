@@ -47,13 +47,28 @@ public class SessionUtil {
         }
     }
     public void setLogin(User user, LoginClient client) {
-        //var tinyUser = new TinyUser(user);
         var sessionSet = redisTemplate.boundSetOps(sessionPrefix + user.getId());
         sessionSet.add(client);
         var userCacheHash = redisTemplate.boundHashOps(userCacheKey);
         userCacheHash.put(user.getId(), user);
     }
 
+//    public Optional<User> getUser(){
+//        var loginInfo = getLoginInfo();
+//        var userCacheHash = redisTemplate.boundHashOps(userCacheKey);
+//        return loginInfo
+//                .map(info->info.getUser())
+//                .map(TinyUser::getId)
+//                .map(id->(User)userCacheHash.get(id));
+//
+//    }
+
+    public String makeToken(User user){
+        var tinyUser = new TinyUser(user);
+        var aes = new SymmetricCrypto(SymmetricAlgorithm.AES, tokenSecret.getBytes());
+        var json = JSONUtil.toJsonStr(tinyUser);
+        return "Bearer "+aes.encryptBase64(json);
+    }
     public Optional<LoginInfo> getLoginInfo(){
         //获取Token
         var request = SpringUtils.getRequest();
