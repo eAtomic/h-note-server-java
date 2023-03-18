@@ -1,6 +1,6 @@
 package cn.hyv5.hnote.entity.qo;
 
-import cn.hyv5.hnote.entity.enums.UserVipType;
+import cn.hyv5.hnote.enums.UserVipType;
 import cn.hyv5.hnote.entity.po.Permission;
 import cn.hyv5.hnote.entity.po.Role;
 import lombok.Data;

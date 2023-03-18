@@ -1,5 +1,6 @@
 package cn.hyv5.hnote.aop;
 
+import cn.hyv5.hnote.entity.dto.LoginRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -23,7 +24,7 @@ public class AuthenticationManagerImpl implements AuthenticationManager{
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        if(authentication instanceof PreAuthenticatedAuthenticationToken preAuth) {
+        if(authentication instanceof LoginRequest preAuth) {
             String username = (String)preAuth.getPrincipal();
             String password = (String)preAuth.getCredentials();
             User user = null;
@@ -40,12 +41,13 @@ public class AuthenticationManagerImpl implements AuthenticationManager{
             if(!match) {
                 throw new RuntimeException("password incorrect");
             }
-            var client = new LoginClient();
-            sessionUtil.setLogin(user, null);
+            LoginClient client = new LoginClient();
+            client.setToken(sessionUtil.makeToken(user));
+            preAuth.setClient(client);
+            sessionUtil.setLogin(user, client);
         }
 
         return authentication;
-        //throw new UnsupportedOperationException("Unimplemented method 'authenticate'");
     }
 
 }

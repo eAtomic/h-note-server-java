@@ -1,9 +1,9 @@
 package cn.hyv5.hnote.entity.po;
 
-import cn.hyv5.hnote.entity.enums.EntityStatusType;
-import cn.hyv5.hnote.entity.enums.UserRegSourceType;
-import cn.hyv5.hnote.entity.enums.UserVerifyCodeType;
-import cn.hyv5.hnote.entity.enums.UserVipType;
+import cn.hyv5.hnote.enums.EntityStatusType;
+import cn.hyv5.hnote.enums.UserRegSourceType;
+import cn.hyv5.hnote.enums.UserVerifyCodeType;
+import cn.hyv5.hnote.enums.UserVipType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.google.common.collect.Lists;
@@ -15,12 +15,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

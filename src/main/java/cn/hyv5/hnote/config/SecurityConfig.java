@@ -70,15 +70,16 @@ public class SecurityConfig {
         
         http
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                //.addFilterBefore(standardAuthenticationProcessingFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(standardAuthenticationProcessingFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin()
-                .loginPage("/")
-                .usernameParameter("account")
-                .loginProcessingUrl("/login/standard")
-                .successHandler(successHandler)
-                .failureHandler(failureHandler)
+                .disable()
+                //.loginPage("/")
+                //.usernameParameter("account")
+                //.loginProcessingUrl("/login/standard")
+                //.successHandler(successHandler)
+                //.failureHandler(failureHandler)
                 //.loginProcessingUrl("/login/sso")
-                .and()
+                //.and()
                 .authorizeHttpRequests((auth)-> auth
                             .requestMatchers(AUTH_WHITELIST).permitAll()
                             .anyRequest().authenticated()
@@ -106,11 +107,11 @@ public class SecurityConfig {
         filter.setAuthenticationFailureHandler(failureHandler);
         return filter;
     }
-    @Bean
-    public AuthenticationProvider authenticationProvider(){
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userService);
-        authenticationProvider.setPasswordEncoder(new BCryptPasswordEncoder());
-        return authenticationProvider;
-    }
+//    @Bean
+//    public AuthenticationProvider authenticationProvider(){
+//        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+//        authenticationProvider.setUserDetailsService(userService);
+//        authenticationProvider.setPasswordEncoder(new BCryptPasswordEncoder());
+//        return authenticationProvider;
+//    }
 }

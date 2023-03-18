@@ -1,4 +1,4 @@
-package cn.hyv5.hnote.entity.enums;
+package cn.hyv5.hnote.enums;
 
 import lombok.AllArgsConstructor;
 

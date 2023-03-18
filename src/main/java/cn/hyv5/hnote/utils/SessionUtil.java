@@ -1,9 +1,11 @@
 package cn.hyv5.hnote.utils;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import cn.hyv5.hnote.entity.bo.login.LoginClient;
 import cn.hyv5.hnote.entity.bo.login.LoginInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -34,11 +36,10 @@ public class SessionUtil {
     @Resource
     private UserService userService;
 
-    @Resource
-    private RedisTemplate<String, LoginClient> redisTemplate;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
-
-    public Optional<String> getAuthorization(HttpServletRequest request) {
+    public static Optional<String> getAuthorization(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StrUtil.isNotBlank(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return Optional.of(bearerToken.substring(7));
@@ -52,16 +53,6 @@ public class SessionUtil {
         var userCacheHash = redisTemplate.boundHashOps(userCacheKey);
         userCacheHash.put(user.getId(), user);
     }
-
-//    public Optional<User> getUser(){
-//        var loginInfo = getLoginInfo();
-//        var userCacheHash = redisTemplate.boundHashOps(userCacheKey);
-//        return loginInfo
-//                .map(info->info.getUser())
-//                .map(TinyUser::getId)
-//                .map(id->(User)userCacheHash.get(id));
-//
-//    }
 
     public String makeToken(User user){
         var tinyUser = new TinyUser(user);
@@ -100,7 +91,7 @@ public class SessionUtil {
             user = userService.getById(tinyUser.getId());
             userCacheHash.put(tinyUser.getId(), user);
         }
-        var loginSessionValue = new LoginInfo(user, sessionSet.members());
+        var loginSessionValue = new LoginInfo(user, sessionSet.members().stream().map(o -> (LoginClient)o).collect(Collectors.toSet()));
 
     return Optional.ofNullable(loginSessionValue);
     }

@@ -1,5 +1,6 @@
 package cn.hyv5.hnote.aop;
 
+import cn.hyv5.hnote.entity.dto.LoginRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,8 +21,10 @@ public class StandardAuthenticationSuccessHandler implements AuthenticationSucce
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         Map result = new HashMap();
-        result.put("status", "ok");
-        result.put("token", "123456798");
+        if(authentication instanceof LoginRequest preAuth) {
+            result.put("status", "ok");
+            result.put("token", preAuth.getClient().getToken());
+        }
 
         String json = objectMapper.writeValueAsString(result);
         response.setContentType("text/json;charset=utf-8");

@@ -1,8 +1,8 @@
 package cn.hyv5.hnote.service;
 
-import cn.hyv5.hnote.entity.enums.EntityStatusType;
-import cn.hyv5.hnote.entity.enums.UserVerifyCodeType;
-import cn.hyv5.hnote.entity.enums.UserVipType;
+import cn.hyv5.hnote.enums.EntityStatusType;
+import cn.hyv5.hnote.enums.UserVerifyCodeType;
+import cn.hyv5.hnote.enums.UserVipType;
 import cn.hyv5.hnote.entity.po.User;
 import cn.hyv5.hnote.utils.SessionUtil;
 import jakarta.annotation.Resource;

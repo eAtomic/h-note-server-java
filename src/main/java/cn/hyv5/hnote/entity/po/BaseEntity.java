@@ -1,19 +1,20 @@
 package cn.hyv5.hnote.entity.po;
 
-import cn.hyv5.hnote.entity.enums.EntityStatusType;
+import cn.hyv5.hnote.enums.EntityStatusType;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import static com.baomidou.mybatisplus.annotation.IdType.ASSIGN_ID;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class BaseEntity<T> extends Model<BaseEntity<T>> {
+public class BaseEntity<T> extends Model<BaseEntity<T>> implements Serializable {
+    static final long serialVersionUID = 1L;
     @TableId(type = ASSIGN_ID)
     private String id;
     @TableLogic

@@ -28,11 +28,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         var user = loginInfo.get().getUser();
-        // var authorities = Streams.concat(
-        //         tinyUser.getRoles().stream(),
-        //         tinyUser.getPermissions().stream()
-        // ).map(SimpleGrantedAuthority::new)
-        //         .collect(Collectors.toList());
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, user.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
