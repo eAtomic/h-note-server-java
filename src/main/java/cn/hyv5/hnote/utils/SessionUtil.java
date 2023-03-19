@@ -1,6 +1,7 @@
 package cn.hyv5.hnote.utils;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import cn.hyv5.hnote.entity.bo.login.LoginClient;
@@ -31,8 +32,8 @@ public class SessionUtil {
     private String tokenSecret;
     @Value("${app.cache.session_prefix}")
     private String sessionPrefix;
-    @Value("${app.cache.user_cache_key}")
-    private String userCacheKey;
+    @Value("${app.cache.user_cache_prefix}")
+    private String userCachePrefix;
     @Resource
     private UserService userService;
 
@@ -48,10 +49,15 @@ public class SessionUtil {
         }
     }
     public void setLogin(User user, LoginClient client) {
-        var sessionSet = redisTemplate.boundSetOps(sessionPrefix + user.getId());
-        sessionSet.add(client);
-        var userCacheHash = redisTemplate.boundHashOps(userCacheKey);
-        userCacheHash.put(user.getId(), user);
+//        var sessionSet = redisTemplate.boundSetOps(sessionPrefix + user.getId());
+//        sessionSet.add(client);
+
+        var session = redisTemplate.boundValueOps(sessionPrefix.concat(user.getId()).concat("|").concat(client.getToken().substring(7)));
+        session.set(client,20, TimeUnit.MINUTES);
+//        var userCacheHash = redisTemplate.boundHashOps(userCacheKey);
+//        userCacheHash.put(user.getId(), user);
+        var userCache = redisTemplate.boundValueOps(userCachePrefix.concat(user.getId()));
+        userCache.set(user, 60, TimeUnit.MINUTES);
     }
 
     public String makeToken(User user){
@@ -78,20 +84,23 @@ public class SessionUtil {
         //获取Token对应的User
         var tinyUser = JSONUtil.toBean(json, TinyUser.class);
 
-        var sessionSet = redisTemplate.boundSetOps(sessionPrefix + tinyUser.getId());
+//        var sessionSet = redisTemplate.boundSetOps(sessionPrefix + tinyUser.getId());
+        var session = redisTemplate.boundValueOps(sessionPrefix.concat(tinyUser.getId()).concat("|").concat(authorization.get()));
 
-        var size = sessionSet.size();
-
-        if(size == null || size == 0) {
+        if(session == null || !session.persist()) {
             return Optional.empty();
         }
-        var userCacheHash = redisTemplate.boundHashOps(userCacheKey);
-        User user = (User)userCacheHash.get(tinyUser.getId());
+        var userCache = redisTemplate.boundValueOps(userCachePrefix.concat(tinyUser.getId()));
+        var user = (User)userCache.get();
         if(user == null) {
             user = userService.getById(tinyUser.getId());
-            userCacheHash.put(tinyUser.getId(), user);
+            userCache.set(user);
         }
-        var loginSessionValue = new LoginInfo(user, sessionSet.members().stream().map(o -> (LoginClient)o).collect(Collectors.toSet()));
+        userCache.expire(20, TimeUnit.MINUTES);
+
+        var clients = redisTemplate.keys(sessionPrefix.concat(tinyUser.getId()).concat("|*")).stream().map(key->(LoginClient)redisTemplate.opsForValue().get(key)).collect(Collectors.toSet());
+
+        var loginSessionValue = new LoginInfo(user, clients);
 
     return Optional.ofNullable(loginSessionValue);
     }

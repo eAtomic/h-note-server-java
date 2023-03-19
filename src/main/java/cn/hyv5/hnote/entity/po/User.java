@@ -6,6 +6,7 @@ import cn.hyv5.hnote.enums.UserVerifyCodeType;
 import cn.hyv5.hnote.enums.UserVipType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -55,6 +56,7 @@ public class User extends BaseEntity<User> implements UserDetails {
     private List<Permission> permissions;
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (roles == null || permissions == null) {
             return Lists.newArrayList();
@@ -71,21 +73,25 @@ public class User extends BaseEntity<User> implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return !getStatus().equals(EntityStatusType.STOP);
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return getStatus().equals(EntityStatusType.NORMAL);
     }

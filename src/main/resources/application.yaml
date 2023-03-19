@@ -5,7 +5,7 @@ app:
     secret: "C#nR%zVCAi2+H_&$"
   cache:
     session_prefix: "SESSION:"
-    user_cache_key: "USER_CACHE"
+    user_cache_prefix: "USER_CACHE_"
 server:
   port: 18080
 spring:

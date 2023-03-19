@@ -35,6 +35,7 @@ dependencies {
     implementation group: 'cn.hutool', name: 'hutool-all', version: '5.8.15'
     implementation group: 'p6spy', name: 'p6spy', version: '3.9.1'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.0.3'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.0-rc1'
     testImplementation 'org.projectlombok:lombok:1.18.22'
     testImplementation 'org.projectlombok:lombok:1.18.22'
     compileOnly 'org.projectlombok:lombok'
